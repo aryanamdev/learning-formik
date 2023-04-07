@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Field, ErrorMessage, Form, FieldArray } from "formik";
 import * as Yup from "yup";
 
 const YoutubeForm = () => {
+  const [formValues, setFormValues] = useState(null);
+
   const initialValues = {
     name: "",
     email: "",
@@ -13,11 +15,24 @@ const YoutubeForm = () => {
       twitter: "",
     },
     phoneNumbers: ["", ""],
-    phNumbers: [""],
   };
 
-  const onSubmit = (values) => {
+  const savedValues = {
+    name: "Aryan Namdev",
+    email: "aryanamdev08@gmail.com",
+    channel: "Mr Beast",
+    comments: "ofjajdf;lajd",
+    social: {
+      facebook: "a;dlkjflakjd",
+      twitter: "akjdf;lfj;",
+    },
+    phoneNumbers: ["akldflk", "ja;lsdfj"],
+  };
+
+  const onSubmit = (values, onSubmitProps) => {
     console.log("Form submit values", values);
+    onSubmitProps.setSubmitting(false);
+    onSubmitProps.resetForm();
   };
 
   // Schema Validations with yup
@@ -33,6 +48,7 @@ const YoutubeForm = () => {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
+      enableReinitialize
     >
       {(formik) => {
         return (
@@ -85,49 +101,22 @@ const YoutubeForm = () => {
               <ErrorMessage className="error" name="twitter" />
             </div>
 
-            <div className="form-control">
-              <label htmlFor="phNumbers">List of Phone Numbers</label>
-              <FieldArray type="text" name="phNumbers" id="secondaryPh">
-                {(props) => {
-                  const { push, remove, form } = props;
-                  const { values } = form;
-                  const { phNumbers } = values;
+            <button type="reset">Reset</button>
 
-                  return (
-                    <div>
-                      {phNumbers.map((phNumber, index) => {
-                        return (
-                          <div key={index}>
-                            <Field name={`phNumbers[${phNumber}]`} />
-                            {index > 0 && (
-                              <button
-                                onClick={() => {
-                                  remove(index);
-                                }}
-                                type="button"
-                              >
-                                -
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                push(index);
-                              }}
-                              type="button"
-                            >
-                              +
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                }}
-              </FieldArray>
-              <ErrorMessage className="error" name="twitter" />
-            </div>
+            <button
+              onClick={() => {
+                setFormValues(savedValues);
+              }}
+              type="button"
+            >
+              Load saved Data
+            </button>
 
-            <button name="submit" type="submit" disabled={!formik.isValid}>
+            <button
+              name="submit"
+              type="submit"
+              disabled={!formik.isValid && formik.isSubmitting}
+            >
               submit
             </button>
           </Form>
